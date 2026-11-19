@@ -12,6 +12,7 @@ import { UsageCards } from './usage';
 import { VersionChip } from './version';
 import { wordmark } from './widgets';
 import { tr } from '../../../shared/i18n';
+import { toggleView, view3d } from '../shinnoi/view';
 
 interface CounterRefs {
   el: HTMLElement;
@@ -150,7 +151,12 @@ export class TopBar implements UiComponent {
           mark,
           h('div', { class: 'ui-brand__text' }, wordmark(), this.status),
         ),
-        h('a', { class: 'ui-view3d', text: tr('Vista 3D'), attrs: { href: '/shinnoi.html', title: tr('Escritório em 3D da Shinnoi Company') } }),
+        h('button', {
+          class: 'ui-view3d',
+          text: view3d() ? tr('Mapa 2D') : tr('Vista 3D'),
+          attrs: { type: 'button', title: tr('Escritório em 3D da Shinnoi Company') },
+          on: { click: toggleView },
+        }),
       ),
       counterWrap,
       this.usage.el,

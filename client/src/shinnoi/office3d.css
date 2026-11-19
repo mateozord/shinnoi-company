@@ -1,0 +1,12 @@
+/* Escritório 3D da Shinnoi Company (office3d.ts): canvas em tela cheia + etiquetas por cima. */
+.s3d-canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; image-rendering: pixelated; touch-action: none; }
+.s3d-labels { position: fixed; inset: 0; pointer-events: none; font-family: 'Pixelify Sans', monospace; overflow: hidden; }
+.s3d-lbl {
+  position: absolute; transform: translate(-50%, -100%); white-space: nowrap; padding: 2px 8px;
+  font-size: 15px; color: var(--c); border: 2px solid var(--c); background: rgb(20 13 28 / 0.82);
+  box-shadow: 3px 3px 0 rgb(0 0 0 / 0.5); transition: opacity 0.3s;
+}
+.s3d-lbl small { display: block; max-width: 170px; overflow: hidden; text-overflow: ellipsis; font-size: 11px; color: #e9dcc9; opacity: 0.85; }
+.s3d-lbl.off { opacity: 0.45; }
+.s3d-lbl.click { pointer-events: auto; cursor: pointer; }
+.s3d-lbl.click:hover { background: rgb(60 36 72 / 0.95); opacity: 1; }

@@ -11187,6 +11187,8 @@ html.is-replay #world {
 
 /* Shinnoi Company: atalho para a vista 3D ao lado da marca. */
 .ui-view3d {
+  cursor: pointer;
+  background: transparent;
   align-self: center;
   margin-left: 6px;
   padding: 4px 10px;

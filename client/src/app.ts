@@ -8,6 +8,7 @@ import type { CitySceneHost } from './ui/world/scene-switch';
 import type { CityScene } from './world/city';
 import { migrateLegacyKeys, safeLocalStorage } from './ui/prefs';
 import { getLocale, tr } from '../../shared/i18n';
+import { view3d } from './shinnoi/view';
 
 export function start(): void {
   // Antes de tudo: o mundo (carteiras) e a UI (preferências) leem o localStorage ao serem criados.
@@ -27,6 +28,7 @@ export function start(): void {
   const world = createWorld(worldCanvas, store);
   const city = cityHost({ world, worldCanvas, uiRoot, mock: store.mock, params, version: () => store.liveSnapshot?.meta.version ?? '' });
   createUI(uiRoot, store, world, city);
+  if (view3d()) mount3d(world, worldCanvas, store);
   // O que esta página pode fazer (porta local ou remota com login) chega antes do primeiro snapshot (ou desiste em
   // poucos segundos e fica a regra de antes).
   if (store.mock) store.connect();
@@ -45,6 +47,25 @@ export function start(): void {
 
   // Facilita a depuração pelo console do navegador.
   Object.assign(window, { habblaud: { store, world, city } });
+}
+
+/**
+ * Troca o mapa 2D pelo escritório 3D (carregado à parte: quem usa o 2D não baixa o three.js). O mundo 2D continua
+ * existindo e suspenso, como dono da seleção: clicar num boneco 3D chama world.select e a gaveta do agente abre como
+ * no 2D.
+ */
+function mount3d(world: WorldApi, worldCanvas: HTMLCanvasElement, store: OfficeStore): void {
+  const canvas = document.createElement('canvas');
+  canvas.className = 's3d-canvas';
+  canvas.setAttribute('aria-label', tr('Escritório em 3D da Shinnoi Company'));
+  const labels = document.createElement('div');
+  labels.className = 's3d-labels';
+  worldCanvas.after(canvas, labels);
+  worldCanvas.hidden = true;
+  world.setSuspended?.(true);
+  void import('./shinnoi/office3d').then(({ createOffice3D }) =>
+    createOffice3D({ canvas, labels, store, onPick: (id) => world.select({ type: 'agent', id }, { focus: true }) }),
+  );
 }
 
 /**
