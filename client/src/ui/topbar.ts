@@ -150,6 +150,7 @@ export class TopBar implements UiComponent {
           mark,
           h('div', { class: 'ui-brand__text' }, wordmark(), this.status),
         ),
+        h('a', { class: 'ui-view3d', text: tr('Vista 3D'), attrs: { href: '/shinnoi.html', title: tr('Escritório em 3D da Shinnoi Company') } }),
       ),
       counterWrap,
       this.usage.el,

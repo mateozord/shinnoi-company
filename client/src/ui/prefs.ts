@@ -35,7 +35,7 @@ export const DEFAULT_PREFS: UiPrefs = {
   liveliness: DEFAULT_WORLD_OPTIONS.liveliness,
   daylight: 'auto',
   theme: 'auto',
-  lofi: false,
+  lofi: true,
   sound: false,
   sounds: DEFAULT_SOUND_SETTINGS,
   browserNotifications: false,

@@ -24,13 +24,14 @@
       @media (max-width: 600px) { #toast { top: auto; bottom: 16px; left: 16px; right: 16px; max-width: none; } }
       #brand { position: fixed; left: 16px; top: 14px; font: 600 20px 'Pixelify Sans', monospace; color: #f4e6d0; }
       #brand b { color: #f0a35e; font-weight: 600; }
+      #brand a { display: block; margin-top: 6px; font-size: 13px; font-weight: 400; color: #f0a35e; pointer-events: auto; }
       #brand span { display: block; font-size: 12px; font-weight: 400; color: #b9a6c9; }
     </style>
   </head>
   <body>
     <canvas id="scene" aria-label="Escritório da Shinnoi Company com os agentes"></canvas>
     <div id="labels"></div>
-    <div id="brand">SHINNOI <b>COMPANY</b><span id="conn">conectando…</span></div>
+    <div id="brand">SHINNOI <b>COMPANY</b><span id="conn">conectando…</span><a href="/">← escritório completo</a></div>
     <div id="toast" role="status" aria-live="polite"></div>
     <script type="module" src="/src/shinnoi/main.ts"></script>
   </body>

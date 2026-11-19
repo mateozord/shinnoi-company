@@ -645,6 +645,8 @@ export const ES: Readonly<Record<string, string>> = {
   "Escritório": "Oficina",
   "Visual lo-fi": "Estilo lo-fi",
   "Paleta quente, pontilhado e grão de filme sobre o escritório.": "Paleta cálida, tramado y grano de película sobre la oficina.",
+  "Vista 3D": "Vista 3D",
+  "Escritório em 3D da Shinnoi Company": "Oficina 3D de Shinnoi Company",
   "Mostrar nomes": "Mostrar nombres",
   "Etiqueta com o nome acima de cada personagem.": "Etiqueta con el nombre sobre cada personaje.",
   "Notificações do navegador": "Notificaciones del navegador",
