@@ -188,9 +188,9 @@ export function createOffice3D(o: Office3DOptions): Office3D {
     }
     const label = makeLabel(def.label, `#${color.getHexString()}`);
     const st: Station = { id: def.id, color, root, body, head, screen, light, dots, label, activity: 0, on: false, agentId: null };
-    root.userData.pick = () => st.agentId;
+    root.userData.pick = () => st.agentId ?? `station:${def.id}`;
     pickables.push(root);
-    label.addEventListener('click', () => st.agentId && o.onPick(st.agentId));
+    label.addEventListener('click', () => o.onPick(st.agentId ?? `station:${def.id}`));
     return st;
   });
 

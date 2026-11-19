@@ -3,6 +3,7 @@
 // Só a Shinnoi usa esta janela, em português: textos diretos, sem passar pelo dicionário do Habblaud.
 import { missionPrompt } from './panels';
 import { savedProject } from './project';
+import { STATIONS, stationOf } from './stations';
 
 interface Folder { name: string; path: string }
 interface Agent { name: string; description: string; model?: string }
@@ -161,4 +162,45 @@ function agentRow(a: Agent, project: string): HTMLLIElement {
     el('div', { className: 's-agents__mission' }, task, go),
     st,
   );
+}
+
+/** Card de uma estação 3D sem sessão rodando: mostra os agentes do projeto daquela mesa (LLM, função) e "Dar missão". */
+export function stationCard(station: string): void {
+  const project = savedProject();
+  const title = STATIONS.find((d) => d.id === station)?.label ?? station;
+  const body = el('div', {}, el('p', { className: 's-agents__status', textContent: 'Carregando…' }));
+  const close = el('button', { type: 'button', className: 's-agents__close', textContent: '✕', title: 'Fechar' });
+  const dlg = el('dialog', { className: 's-agents' }, el('div', { className: 's-agents__head' }, el('h2', { textContent: title }), close), body);
+  close.addEventListener('click', () => dlg.close());
+  dlg.addEventListener('close', () => dlg.remove());
+  document.body.append(dlg);
+  dlg.showModal();
+  if (!project) {
+    body.replaceChildren(el('p', { className: 's-agents__status', textContent: 'Escolha um projeto na barra do topo para ver os agentes desta mesa.' }));
+    return;
+  }
+  json<{ agents: Agent[] }>(`/api/spawn/agents?project=${encodeURIComponent(project)}`)
+    .then(({ agents }) => {
+      // pelo nome primeiro: a descrição do QA cita "editor" e o levaria para a mesa errada
+      const deskOf = (a: Agent) => { const byName = stationOf({ role: a.name }); return byName !== 'geral' ? byName : stationOf({ role: '', title: a.description }); };
+      const mine = agents.filter((a) => deskOf(a) === station);
+      if (!mine.length) return body.replaceChildren(el('p', { className: 's-agents__status', textContent: 'Nenhum agente deste projeto nesta mesa. Crie um em "+ Agente".' }));
+      body.replaceChildren(
+        ...mine.flatMap((a) => [
+          el('div', { className: 's-card' },
+            el('div', { className: 's-card__tile' }, el('span', { textContent: 'Agente' }), el('b', { textContent: a.name })),
+            el('div', { className: 's-card__tile' }, el('span', { textContent: 'LLM' }), el('b', { textContent: a.model ?? 'padrão' })),
+            el('div', { className: 's-card__tile s-card__tile--wide' }, el('span', { textContent: 'Fazendo agora' }), el('b', { textContent: 'Parado (sem missão rodando)' })),
+            el('div', { className: 's-card__tile s-card__tile--wide' }, el('span', { textContent: 'Função' }), el('b', { textContent: a.description })),
+          ),
+          el('ul', { className: 's-agents__list' }, withoutDescription(agentRow(a, project))),
+        ]),
+      );
+    })
+    .catch((e: Error) => body.replaceChildren(el('p', { className: 's-agents__status', textContent: e.message })));
+}
+
+function withoutDescription(row: HTMLLIElement): HTMLLIElement {
+  row.querySelector('p')?.remove();
+  return row;
 }

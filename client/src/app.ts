@@ -64,7 +64,7 @@ function mount3d(world: WorldApi, worldCanvas: HTMLCanvasElement, store: OfficeS
   worldCanvas.hidden = true;
   world.setSuspended?.(true);
   void import('./shinnoi/office3d').then(({ createOffice3D }) =>
-    createOffice3D({ canvas, labels, store, onPick: (id) => world.select({ type: 'agent', id }, { focus: true }) }),
+    createOffice3D({ canvas, labels, store, onPick: (id) => (id.startsWith('station:') ? void import('./shinnoi/agent-dialog').then((m) => m.stationCard(id.slice(8))) : world.select({ type: 'agent', id }, { focus: true })) }),
   );
 }
 
