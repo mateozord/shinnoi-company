@@ -15,6 +15,31 @@
       }
       .lbl small { display: block; max-width: 170px; overflow: hidden; text-overflow: ellipsis; font-size: 11px; color: #e9dcc9; opacity: 0.85; }
       .lbl.off { opacity: 0.45; }
+      .lbl.click { pointer-events: auto; cursor: pointer; }
+      .lbl.click:hover { background: rgb(60 36 72 / 0.95); }
+      .panel {
+        position: fixed; left: 16px; bottom: 16px; width: 340px; padding: 12px; box-sizing: border-box;
+        font: 14px 'Pixelify Sans', monospace; color: #f4e6d0; background: rgb(20 13 28 / 0.92);
+        border: 2px solid #f0a35e; box-shadow: 3px 3px 0 rgb(0 0 0 / 0.5);
+      }
+      .panel h2 { margin: 0 0 8px; font-size: 16px; font-weight: 600; color: #f0a35e; }
+      .panel label { display: block; margin: 6px 0 2px; font-size: 12px; color: #b9a6c9; }
+      .panel select, .panel textarea {
+        width: 100%; box-sizing: border-box; font: 14px 'Pixelify Sans', monospace; color: #f4e6d0;
+        background: #1e1327; border: 2px solid #4a3359; padding: 4px 6px;
+      }
+      .panel textarea { min-height: 70px; resize: vertical; }
+      .panel select:focus-visible, .panel textarea:focus-visible, .panel button:focus-visible { outline: 2px solid #f0a35e; outline-offset: 1px; }
+      .panel button {
+        margin-top: 8px; padding: 6px 14px; font: 600 14px 'Pixelify Sans', monospace; color: #140d1c;
+        background: #f0a35e; border: 0; box-shadow: 2px 2px 0 rgb(0 0 0 / 0.5); cursor: pointer;
+      }
+      .panel button[value="cancel"] { background: #4a3359; color: #f4e6d0; margin-left: 6px; }
+      .panel button:disabled { opacity: 0.5; cursor: wait; }
+      .panel p { margin: 6px 0 0; min-height: 1em; font-size: 12px; color: #e9dcc9; }
+      dialog.panel { inset: auto; left: 50%; top: 50%; transform: translate(-50%, -50%); margin: 0; }
+      dialog::backdrop { background: rgb(10 6 14 / 0.6); }
+      #hint { position: fixed; right: 16px; bottom: 16px; font: 12px 'Pixelify Sans', monospace; color: #9a87ab; }
       #toast {
         position: fixed; top: 16px; right: 16px; max-width: min(360px, calc(100vw - 32px)); padding: 8px 12px;
         font: 14px 'Pixelify Sans', monospace; color: #f4e6d0; background: rgb(20 13 28 / 0.9);
@@ -33,6 +58,27 @@
     <div id="labels"></div>
     <div id="brand">SHINNOI <b>COMPANY</b><span id="conn">conectando…</span><a href="/">← escritório completo</a></div>
     <div id="toast" role="status" aria-live="polite"></div>
+    <form id="mission" class="panel" aria-label="Nova missão">
+      <h2>Nova missão</h2>
+      <label for="m-who">Para quem</label>
+      <select id="m-who"></select>
+      <label for="m-folder">Pasta</label>
+      <select id="m-folder"></select>
+      <label for="m-text">Missão</label>
+      <textarea id="m-text" required placeholder="Ex.: ache 5 temas de Natal para o próximo vídeo"></textarea>
+      <button type="submit">Enviar missão</button>
+      <p id="m-status" role="status" aria-live="polite"></p>
+    </form>
+    <dialog id="msg" class="panel">
+      <form id="msg-form">
+        <h2>Mensagem para <span id="msg-to"></span></h2>
+        <label for="msg-text">Mensagem</label>
+        <textarea id="msg-text" required></textarea>
+        <button type="submit">Enviar</button><button type="submit" value="cancel" formnovalidate>Fechar</button>
+        <p id="msg-status" role="status" aria-live="polite"></p>
+      </form>
+    </dialog>
+    <div id="hint">arraste: girar · rodinha: zoom · clique numa porta: mensagem</div>
     <script type="module" src="/src/shinnoi/main.ts"></script>
   </body>
 </html>

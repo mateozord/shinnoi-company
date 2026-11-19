@@ -3,9 +3,11 @@
 import '@fontsource/pixelify-sans/400.css';
 import '@fontsource/pixelify-sans/600.css';
 import * as THREE from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { OfficeStore } from '../net/store';
 import type { AgentInfo, OfficeSnapshot } from '../../../shared/types';
 import { STATIONS, isActive, stationOf, type StationId } from './stations';
+import { setupPanels } from './panels';
 
 THREE.ColorManagement.enabled = false;
 const PIXEL = 3; // 1 pixel da cena = 3 pixels da tela
@@ -174,7 +176,12 @@ function syncDoors(mains: AgentInfo[]): void {
       const mat = toon(doorMatOff);
       const mesh = box(0.9, 1.6, 0.15, mat);
       scene.add(mesh);
-      d = { mesh, mat, label: makeLabel('', '#b78ae0'), on: false };
+      const label = makeLabel('', '#b78ae0');
+      label.classList.add('click');
+      label.title = 'Clique para mandar uma mensagem';
+      const id = m.id;
+      label.addEventListener('click', () => openMessage(id));
+      d = { mesh, mat, label, on: false };
       doors.set(m.id, d);
     }
     const x = (i - (mains.length - 1) / 2) * 3.2;
@@ -218,6 +225,7 @@ const store = new OfficeStore({ mock: new URLSearchParams(location.search).has('
 store.on('snapshot', apply);
 store.on('connection', (c) => { conn.textContent = c === 'open' || c === 'mock' ? 'ao vivo' : c === 'connecting' ? 'conectando…' : 'sem conexão'; });
 store.connect();
+const { openMessage } = setupPanels(store);
 
 // ---------- layout + loop ----------
 function resize(): void {
@@ -227,16 +235,19 @@ function resize(): void {
   target.setSize(w, h);
   post.uniforms.res.value.set(w, h);
   camera.aspect = w / h;
-  // em tela estreita (celular) afasta a câmera para caber o arco
-  const dist = camera.aspect < 1 ? 26 / camera.aspect ** 0.6 : 20;
-  camera.position.set(0, dist * 0.62, dist * 0.78);
-  camera.lookAt(0, 0.4, -0.6);
-  // a névoa acompanha a distância da câmera (senão o celular, com a câmera mais longe, vê só névoa)
-  scene.fog = new THREE.Fog(0x1a1024, dist * 1.15, dist * 2.2);
   camera.updateProjectionMatrix();
 }
 addEventListener('resize', resize);
 resize();
+camera.position.set(0, 12.4, 15.6);
+// arrastar gira, rodinha dá zoom, botão direito move; limites para não passar por baixo do piso
+const controls = new OrbitControls(camera, canvas);
+controls.target.set(0, 0.4, -0.6);
+controls.enableDamping = true;
+controls.minDistance = 7;
+controls.maxDistance = 32;
+controls.maxPolarAngle = Math.PI * 0.45;
+controls.update();
 
 const v = new THREE.Vector3();
 const place = (el: HTMLElement, obj: THREE.Object3D, y: number) => {
@@ -277,6 +288,11 @@ function frame(): void {
     d.label.classList.toggle('off', !d.on);
     place(d.label, d.mesh, 1.15);
   }
+  controls.update();
+  // a névoa acompanha a distância da câmera (zoom)
+  const dist = camera.position.distanceTo(controls.target);
+  (scene.fog as THREE.Fog).near = dist * 1.15;
+  (scene.fog as THREE.Fog).far = dist * 2.2;
   renderer.setRenderTarget(target);
   renderer.render(scene, camera);
   renderer.setRenderTarget(null);
