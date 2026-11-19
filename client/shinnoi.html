@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Shinnoi Company</title>
+    <style>
+      html, body { margin: 0; height: 100%; background: #140d1c; overflow: hidden; }
+      #scene { position: fixed; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; display: block; }
+      #labels { position: fixed; inset: 0; pointer-events: none; font-family: 'Pixelify Sans', monospace; }
+      .lbl {
+        position: absolute; transform: translate(-50%, -100%); white-space: nowrap; padding: 2px 8px;
+        font-size: 15px; color: var(--c); border: 2px solid var(--c); background: rgb(20 13 28 / 0.82);
+        box-shadow: 3px 3px 0 rgb(0 0 0 / 0.5); transition: opacity 0.3s;
+      }
+      .lbl small { display: block; max-width: 170px; overflow: hidden; text-overflow: ellipsis; font-size: 11px; color: #e9dcc9; opacity: 0.85; }
+      .lbl.off { opacity: 0.45; }
+      #toast {
+        position: fixed; top: 16px; right: 16px; max-width: min(360px, calc(100vw - 32px)); padding: 8px 12px;
+        font: 14px 'Pixelify Sans', monospace; color: #f4e6d0; background: rgb(20 13 28 / 0.9);
+        border: 2px solid #f0a35e; box-shadow: 3px 3px 0 rgb(0 0 0 / 0.5);
+      }
+      #toast:empty { display: none; }
+      @media (max-width: 600px) { #toast { top: auto; bottom: 16px; left: 16px; right: 16px; max-width: none; } }
+      #brand { position: fixed; left: 16px; top: 14px; font: 600 20px 'Pixelify Sans', monospace; color: #f4e6d0; }
+      #brand b { color: #f0a35e; font-weight: 600; }
+      #brand span { display: block; font-size: 12px; font-weight: 400; color: #b9a6c9; }
+    </style>
+  </head>
+  <body>
+    <canvas id="scene" aria-label="Escritório da Shinnoi Company com os agentes"></canvas>
+    <div id="labels"></div>
+    <div id="brand">SHINNOI <b>COMPANY</b><span id="conn">conectando…</span></div>
+    <div id="toast" role="status" aria-live="polite"></div>
+    <script type="module" src="/src/shinnoi/main.ts"></script>
+  </body>
+</html>
