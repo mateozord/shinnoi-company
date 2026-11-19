@@ -3,6 +3,7 @@
 //   npm run dev    -> tsx server/index.ts --dev (Vite em middleware mode, HMR no mesmo servidor)
 //   npm start      -> node dist/server/index.js (serve dist/client)
 import http from 'node:http';
+import { readFileSync, statSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { codexDirsRefused, isDefaultDir } from './accounts/detect';
 import { AccountsService } from './accounts/service';
@@ -44,7 +45,7 @@ import type { WorldLocale } from '../shared/world/protocol';
 import { createCliRunner, createOpener, SpawnService } from './spawn/spawn';
 import { runnableClaudeBin } from './claude-bin';
 import { AttachmentStore } from './spawn/attachments';
-import { recentFolders } from './spawn/folders';
+import { pinnedFolders, recentFolders } from './spawn/folders';
 import { isDemoId } from '../shared/timeline';
 import { DictationService } from './dictation/dictation';
 import { createWhisperTranscriber, findWhisper } from './dictation/whisper';
@@ -364,12 +365,40 @@ const api = createApiHandler({
   dictation,
   deliveries,
   files: deliveryFiles,
+  addProject: (name, dir) => {
+    const file = join(process.cwd(), 'shinnoi.projects.json');
+    const n = name.trim().slice(0, 48);
+    if (!n) return { error: tr('dê um nome ao projeto') };
+    try {
+      if (!statSync(dir).isDirectory()) return { error: tr('pasta não encontrada neste computador') };
+    } catch {
+      return { error: tr('pasta não encontrada neste computador') };
+    }
+    let list: { name: string; path: string }[] = [];
+    try {
+      const raw: unknown = JSON.parse(readFileSync(file, 'utf8'));
+      if (Array.isArray(raw)) list = raw as typeof list;
+    } catch {
+      // arquivo novo
+    }
+    if (list.some((p) => p.path.toLowerCase() === dir.toLowerCase())) return { error: tr('esse projeto já está cadastrado') };
+    list.push({ name: n, path: dir });
+    writeFileSync(file, JSON.stringify(list, null, 2));
+    return { ok: true };
+  },
   spawnFolders: async () => {
     const snap = hub.current();
     const last = new Map<string, number>();
     for (const a of snap.agents) last.set(a.roomId, Math.max(last.get(a.roomId) ?? 0, a.lastEventAt ?? 0));
     const rooms = snap.rooms.filter((r) => !isDemoId(r.id)).map((r) => ({ path: r.path, lastAt: last.get(r.id) ?? 0 }));
-    return recentFolders(history ? await history.list().catch(() => []) : [], rooms);
+    const recent = recentFolders(history ? await history.list().catch(() => []) : [], rooms);
+    let pinned: unknown = null;
+    try {
+      pinned = JSON.parse(readFileSync(join(process.cwd(), 'shinnoi.projects.json'), 'utf8'));
+    } catch {
+      // sem arquivo de projetos: lista de recentes
+    }
+    return pinnedFolders(pinned, recent) ?? recent;
   },
   codexLive,
   stats,

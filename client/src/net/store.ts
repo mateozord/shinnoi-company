@@ -8,6 +8,7 @@ import type { AppearanceParts } from '../../../shared/appearance';
 import type { Activity, AgentDetail, AgentInfo, FeedItem, Notice, OfficeSnapshot, OutboxMessage, PermissionDecision, PermissionRequestInfo, RoomInfo } from '../../../shared/types';
 import { DemoSimulator } from '../../../shared/demo/simulator';
 import { tr } from '../../../shared/i18n';
+import { filterSnapshot, savedProject } from '../shinnoi/project';
 
 export type ConnectionState = 'connecting' | 'open' | 'closed' | 'mock';
 
@@ -383,7 +384,23 @@ export class OfficeStore {
     this.checkBuild(snap.meta.build);
   }
 
-  private setSnapshot(snap: OfficeSnapshot): void {
+  /** Shinnoi Company: snapshot sem filtro e o projeto escolhido (shinnoi/project.ts). */
+  private raw: OfficeSnapshot | null = null;
+  private project: string | null = savedProject();
+
+  /** Troca o projeto mostrado (null = todos) e republica o último snapshot já filtrado. */
+  setProject(path: string | null): void {
+    this.project = path;
+    if (this.raw) this.setSnapshot(this.raw);
+  }
+
+  get currentProject(): string | null {
+    return this.project;
+  }
+
+  private setSnapshot(raw: OfficeSnapshot): void {
+    this.raw = raw;
+    const snap = filterSnapshot(raw, this.project);
     this.snapshot = snap;
     this.agentIndex = new Map(snap.agents.map((a) => [a.id, a]));
     this.roomIndex = new Map(snap.rooms.map((r) => [r.id, r]));
@@ -408,8 +425,10 @@ export class OfficeStore {
     const known = new Set(this.feed.map((f) => f.id));
     const fresh = items.filter((f) => !known.has(f.id));
     if (!fresh.length) return;
-    this.feed = [...this.feed, ...fresh].slice(-FEED_LIMIT);
-    this.emit('feed', fresh);
+    // com um projeto escolhido, o feed mostra só as salas dele
+    const shown = this.project ? fresh.filter((f) => this.roomIndex.has(f.roomId)) : fresh;
+    this.feed = [...this.feed, ...shown].slice(-FEED_LIMIT);
+    if (shown.length) this.emit('feed', shown);
   }
 
   /** Lê o JSON de um evento SSE; mensagens corrompidas são ignoradas sem derrubar o stream. */

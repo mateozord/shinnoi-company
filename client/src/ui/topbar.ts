@@ -13,6 +13,7 @@ import { VersionChip } from './version';
 import { wordmark } from './widgets';
 import { tr } from '../../../shared/i18n';
 import { toggleView, view3d } from '../shinnoi/view';
+import { projectPicker } from '../shinnoi/picker';
 
 interface CounterRefs {
   el: HTMLElement;
@@ -157,6 +158,7 @@ export class TopBar implements UiComponent {
           attrs: { type: 'button', title: tr('Escritório em 3D da Shinnoi Company') },
           on: { click: toggleView },
         }),
+        projectPicker(),
       ),
       counterWrap,
       this.usage.el,

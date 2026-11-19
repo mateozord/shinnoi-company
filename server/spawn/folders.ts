@@ -54,3 +54,20 @@ export function recentFolders(
   for (const r of rooms) add(r.path, r.lastAt ?? 0, false);
   return [...byPath.values()].sort((a, b) => b.lastAt - a.lastAt || a.path.localeCompare(b.path)).slice(0, limit);
 }
+
+/**
+ * Shinnoi Company: projetos fixos do "Novo agente" (shinnoi.projects.json na pasta do servidor, `[{ "name", "path" }]`).
+ * Com o arquivo, a lista mostra só esses projetos, na ordem do arquivo; sem ele (ou inválido), fica a lista de recentes.
+ */
+export function pinnedFolders(raw: unknown, recent: SpawnFolder[]): SpawnFolder[] | null {
+  if (!Array.isArray(raw)) return null;
+  const out: SpawnFolder[] = [];
+  for (const p of raw) {
+    if (!p || typeof p !== 'object') continue;
+    const { name, path } = p as { name?: unknown; path?: unknown };
+    if (typeof name !== 'string' || typeof path !== 'string' || !absolute(path)) continue;
+    const r = recent.find((f) => f.path.toLowerCase() === path.toLowerCase());
+    out.push({ path, name, lastAt: r?.lastAt ?? 0, sessions: r?.sessions ?? 0 });
+  }
+  return out.length ? out : null;
+}

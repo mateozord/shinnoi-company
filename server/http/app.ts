@@ -67,6 +67,8 @@ export interface ApiDeps {
   spawn?: SpawnService;
   /** Pastas sugeridas no "Novo agente" (GET /api/spawn/folders; spawn/folders.ts): projetos recentes. */
   spawnFolders?: () => Promise<SpawnFolder[]>;
+  /** Shinnoi Company: cadastra um projeto fixo (POST /api/spawn/projects). */
+  addProject?: (name: string, path: string) => { ok: true } | { error: string };
   /** Anexos do "Novo agente" (POST /api/spawn/attachments; spawn/attachments.ts). */
   attachments?: AttachmentStore;
   /** Ditado (/api/dictation e, para o auxiliar do host, /api/host/dictation/*; dictation/dictation.ts). */
@@ -498,6 +500,18 @@ export function createApiHandler(deps: ApiDeps): (req: IncomingMessage, res: Ser
       else if (path === '/api/spawn/folders') {
         if (!isRead) methodNotAllowed(res, 'GET');
         else (deps.spawnFolders ?? (async () => []))().then((folders) => sendJson(res, 200, { folders }), (err) => fail(res, err));
+      } else if (path === '/api/spawn/projects') {
+        // Shinnoi Company: cadastra um projeto fixo (shinnoi.projects.json).
+        if (method !== 'POST') methodNotAllowed(res, 'POST');
+        else if (!deps.addProject) sendJson(res, 403, { error: tr('cadastro de projetos desligado') });
+        else
+          readJson(req)
+            .then((body) => {
+              const { name, path: dir } = (body ?? {}) as { name?: unknown; path?: unknown };
+              const r = deps.addProject!(typeof name === 'string' ? name : '', typeof dir === 'string' ? dir : '');
+              sendJson(res, 'error' in r ? 400 : 201, r);
+            })
+            .catch((err) => fail(res, err));
       } else if (path === '/api/spawn/attachments') {
         const store = deps.attachments;
         if (method !== 'POST') methodNotAllowed(res, 'POST');
