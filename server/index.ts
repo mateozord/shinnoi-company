@@ -46,6 +46,7 @@ import { createCliRunner, createOpener, SpawnService } from './spawn/spawn';
 import { runnableClaudeBin } from './claude-bin';
 import { AttachmentStore } from './spawn/attachments';
 import { pinnedFolders, recentFolders } from './spawn/folders';
+import { createAgent, listAgents } from './spawn/agents';
 import { isDemoId } from '../shared/timeline';
 import { DictationService } from './dictation/dictation';
 import { createWhisperTranscriber, findWhisper } from './dictation/whisper';
@@ -59,6 +60,16 @@ import { OwnerSocial } from './world/social';
 import { BuildingTokens } from './world/tokens';
 import { BuildingUplink } from './world/uplink';
 import { WorldViewer } from './world/viewer';
+
+/** Shinnoi Company: a pasta é um dos projetos de shinnoi.projects.json (trava para gravar agentes só neles). */
+function isPinned(project: string): boolean {
+  try {
+    const list: unknown = JSON.parse(readFileSync(join(process.cwd(), 'shinnoi.projects.json'), 'utf8'));
+    return Array.isArray(list) && list.some((p) => typeof p?.path === 'string' && p.path.toLowerCase() === project.toLowerCase());
+  } catch {
+    return false;
+  }
+}
 
 const config = loadConfig();
 const startedAt = Date.now();
@@ -365,6 +376,13 @@ const api = createApiHandler({
   dictation,
   deliveries,
   files: deliveryFiles,
+  projectAgents: {
+    list: (project) => (isPinned(project) ? { agents: listAgents(project) } : { error: tr('projeto não cadastrado') }),
+    create: (project, body) =>
+      isPinned(project)
+        ? createAgent(project, { name: body.name, description: body.description, model: body.model, prompt: body.prompt })
+        : { error: tr('projeto não cadastrado') },
+  },
   addProject: (name, dir) => {
     const file = join(process.cwd(), 'shinnoi.projects.json');
     const n = name.trim().slice(0, 48);

@@ -11217,3 +11217,60 @@ html.is-replay #world {
   cursor: pointer;
 }
 .ui-project:focus-visible { outline: 2px solid var(--ui-accent); outline-offset: 2px; }
+
+/* Shinnoi Company: janela de agentes do projeto (shinnoi/agent-dialog.ts). */
+.s-agents {
+  width: min(560px, calc(100vw - 32px));
+  max-height: calc(100vh - 48px);
+  padding: 16px;
+  box-sizing: border-box;
+  color: var(--ui-text);
+  font: 14px var(--font-ui);
+  background: var(--ui-bg-solid);
+  border: 2px solid var(--ui-accent);
+  border-radius: var(--radius);
+  box-shadow: 4px 4px 0 rgb(0 0 0 / 0.5);
+}
+.s-agents::backdrop { background: rgb(10 6 14 / 0.6); }
+.s-agents__head { display: flex; align-items: center; justify-content: space-between; }
+.s-agents h2, .s-agents h3 { font-family: var(--font-px); color: var(--ui-accent); margin: 12px 0 6px; }
+.s-agents h2 { margin-top: 0; font-size: 18px; }
+.s-agents h3 { font-size: 15px; }
+.s-agents label { display: block; margin: 8px 0 3px; font-size: 12px; color: var(--ui-muted); }
+.s-agents input, .s-agents select, .s-agents textarea {
+  width: 100%; box-sizing: border-box; padding: 6px 8px; font: 14px var(--font-ui); color: var(--ui-text);
+  background: var(--ui-bg-soft); border: 2px solid var(--ui-line-strong); border-radius: var(--radius-sm);
+}
+.s-agents textarea { font-family: var(--font-mono); font-size: 12px; resize: vertical; }
+.s-agents :focus-visible { outline: 2px solid var(--ui-accent); outline-offset: 1px; }
+.s-agents__close { background: none; border: 0; color: var(--ui-muted); font-size: 18px; cursor: pointer; }
+.s-agents__primary {
+  margin-top: 8px; padding: 6px 14px; font: 600 13px var(--font-px); color: #140d1c; background: var(--ui-accent);
+  border: 0; border-radius: var(--radius-sm); box-shadow: 2px 2px 0 rgb(0 0 0 / 0.45); cursor: pointer; white-space: nowrap;
+}
+.s-agents__primary:disabled { opacity: 0.5; cursor: wait; }
+.s-agents__list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.s-agents__list li { padding: 8px; border: 1px solid var(--ui-line-strong); border-radius: var(--radius-sm); }
+.s-agents__list p { margin: 4px 0; font-size: 12px; color: var(--ui-muted); }
+.s-agents__list small { font-size: 12px; color: var(--ui-text); }
+.s-agents__mission { display: flex; gap: 6px; align-items: end; }
+.s-agents__status { min-height: 1em; margin: 6px 0 0; font-size: 12px; }
+
+/* Shinnoi Company: cartão do agente na gaveta (LLM, fazendo agora, função). */
+.s-card {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+  margin: 10px 0 4px;
+}
+.s-card__tile {
+  min-width: 0;
+  padding: 8px 10px;
+  background: var(--ui-bg-soft);
+  border: 2px solid var(--ui-line-strong);
+  border-left: 4px solid var(--ui-accent);
+  border-radius: var(--radius-sm);
+}
+.s-card__tile--wide { grid-column: 1 / -1; }
+.s-card__tile span { display: block; font: 500 11px var(--font-px); color: var(--ui-muted); text-transform: uppercase; letter-spacing: 0.04em; }
+.s-card__tile b { display: block; margin-top: 2px; font: 600 14px var(--font-ui); color: var(--ui-text); overflow-wrap: anywhere; }

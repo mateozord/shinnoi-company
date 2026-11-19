@@ -200,6 +200,8 @@ class AgentView {
   private avatar: HTMLElement;
   private name: HTMLElement;
   private role: HTMLElement;
+  /** Shinnoi Company: cartão em destaque com LLM, o que está fazendo e a função. */
+  private card = { llm: h('b'), doing: h('b'), job: h('b') };
   private title: HTMLElement;
   private accChip: HTMLElement;
   private accName: HTMLElement;
@@ -407,6 +409,13 @@ class AgentView {
       'div',
       { class: 'ui-drawer__view ui-agent-view' },
       h('div', { class: 'ui-hero' }, this.avatar, heroText),
+      h(
+        'div',
+        { class: 's-card' },
+        h('div', { class: 's-card__tile' }, h('span', { text: tr('LLM') }), this.card.llm),
+        h('div', { class: 's-card__tile s-card__tile--wide' }, h('span', { text: tr('Fazendo agora') }), this.card.doing),
+        h('div', { class: 's-card__tile s-card__tile--wide' }, h('span', { text: tr('Função') }), this.card.job),
+      ),
       this.character.el,
       this.title,
       this.gone,
@@ -537,6 +546,9 @@ class AgentView {
     setText(this.name, a.name);
     this.character.render(a, !!live);
     setText(this.role, roleLabel(a));
+    setText(this.card.llm, a.model ? prettyModel(a.model) : tr('padrão da conta'));
+    setText(this.card.doing, a.activity ? `${a.activity.icon} ${a.activity.text}` : tr('Parado'));
+    setText(this.card.job, a.title ? `${roleLabel(a)} · ${a.title}` : roleLabel(a));
     setVariant(this.role, 'ui-role--', a.kind);
     setText(this.title, a.title ?? '');
     setHidden(this.title, !a.title);

@@ -18,6 +18,7 @@ import { tr } from '../../shared/i18n';
 import type { SpawnService } from '../spawn/spawn';
 import { ATTACHMENT_BODY_MAX, parseAttachment, type AttachmentStore } from '../spawn/attachments';
 import type { SpawnFolder } from '../spawn/folders';
+import type { ProjectAgent } from '../spawn/agents';
 import { AUDIO_BODY_MAX, type DictationService } from '../dictation/dictation';
 import type { DeliveryIndex } from '../deliveries/deliveries';
 import type { FileFetcher } from '../deliveries/fetcher';
@@ -69,6 +70,11 @@ export interface ApiDeps {
   spawnFolders?: () => Promise<SpawnFolder[]>;
   /** Shinnoi Company: cadastra um projeto fixo (POST /api/spawn/projects). */
   addProject?: (name: string, path: string) => { ok: true } | { error: string };
+  /** Shinnoi Company: agentes de um projeto cadastrado (GET/POST /api/spawn/agents; spawn/agents.ts). */
+  projectAgents?: {
+    list(project: string): { agents: ProjectAgent[] } | { error: string };
+    create(project: string, body: Record<string, unknown>): { ok: true; name: string } | { error: string };
+  };
   /** Anexos do "Novo agente" (POST /api/spawn/attachments; spawn/attachments.ts). */
   attachments?: AttachmentStore;
   /** Ditado (/api/dictation e, para o auxiliar do host, /api/host/dictation/*; dictation/dictation.ts). */
@@ -509,6 +515,21 @@ export function createApiHandler(deps: ApiDeps): (req: IncomingMessage, res: Ser
             .then((body) => {
               const { name, path: dir } = (body ?? {}) as { name?: unknown; path?: unknown };
               const r = deps.addProject!(typeof name === 'string' ? name : '', typeof dir === 'string' ? dir : '');
+              sendJson(res, 'error' in r ? 400 : 201, r);
+            })
+            .catch((err) => fail(res, err));
+      } else if (path === '/api/spawn/agents') {
+        const pa = deps.projectAgents;
+        if (!pa) sendJson(res, 403, { error: tr('agentes do projeto desligados') });
+        else if (isRead) {
+          const r = pa.list(url.searchParams.get('project') ?? '');
+          sendJson(res, 'error' in r ? 400 : 200, r);
+        } else if (method !== 'POST') methodNotAllowed(res, 'GET, POST');
+        else
+          readJson(req)
+            .then((body) => {
+              const b = (body && typeof body === 'object' ? body : {}) as Record<string, unknown>;
+              const r = pa.create(typeof b.project === 'string' ? b.project : '', b);
               sendJson(res, 'error' in r ? 400 : 201, r);
             })
             .catch((err) => fail(res, err));

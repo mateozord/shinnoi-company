@@ -1,7 +1,6 @@
 // Painéis da vista 3D: "Nova missão" (POST /api/spawn, igual ao Novo agente do escritório) e mensagem para uma
 // sessão aberta (POST /api/messages via OfficeStore).
 import type { OfficeStore } from '../net/store';
-import { STATIONS } from './stations';
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 
@@ -26,13 +25,22 @@ export function setupPanels(store: OfficeStore): { openMessage: (agentId: string
   const text = $<HTMLTextAreaElement>('m-text');
   const status = $<HTMLParagraphElement>('m-status');
   const send = form.querySelector('button')!;
-  for (const s of STATIONS) who.append(new Option(s.id === 'geral' ? 'Geral (sem agente fixo)' : s.label, s.id));
+  // "Para quem": os agentes do projeto escolhido (.claude/agents) + Geral
+  const loadWho = () => {
+    who.replaceChildren(new Option('Geral (sem agente fixo)', 'geral'));
+    if (!folder.value) return;
+    json<{ agents: { name: string }[] }>(`/api/spawn/agents?project=${encodeURIComponent(folder.value)}`)
+      .then(({ agents }) => { for (const a of agents) who.append(new Option(a.name, a.name)); })
+      .catch(() => {});
+  };
+  folder.addEventListener('change', loadWho);
 
   void json<{ folders: { path: string; name: string }[] }>('/api/spawn/folders')
     .then(({ folders }) => {
       for (const f of folders) folder.append(new Option(f.name, f.path));
       const lofi = folders.find((f) => f.name === 'lofi-animations');
       if (lofi) folder.value = lofi.path;
+      loadWho();
     })
     .catch((e: Error) => { status.textContent = `Pastas: ${e.message}`; });
 

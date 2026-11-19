@@ -9,3 +9,12 @@ describe('missionPrompt', () => {
     expect(missionPrompt('editor', 'vídeo da geladeira')).toBe('Use o subagente "editor" (definido em .claude/agents/editor.md) para: vídeo da geladeira');
   });
 });
+
+import { promptTemplate } from './agent-dialog';
+
+describe('promptTemplate', () => {
+  it('usa nome e trabalho, com marcador quando vazio', () => {
+    expect(promptTemplate('roteirista', 'roteiros curtos')).toContain('Você é roteirista, especialista em roteiros curtos.');
+    expect(promptTemplate('', '')).toContain('<descreva a especialidade>');
+  });
+});

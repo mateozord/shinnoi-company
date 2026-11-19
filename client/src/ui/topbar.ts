@@ -14,6 +14,7 @@ import { wordmark } from './widgets';
 import { tr } from '../../../shared/i18n';
 import { toggleView, view3d } from '../shinnoi/view';
 import { projectPicker } from '../shinnoi/picker';
+import { agentsButton } from '../shinnoi/agent-dialog';
 
 interface CounterRefs {
   el: HTMLElement;
@@ -159,6 +160,7 @@ export class TopBar implements UiComponent {
           on: { click: toggleView },
         }),
         projectPicker(),
+        agentsButton(),
       ),
       counterWrap,
       this.usage.el,
