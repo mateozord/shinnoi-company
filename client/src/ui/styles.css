@@ -11147,3 +11147,40 @@ html.is-replay #world {
 .ui-world-chip__visitors[hidden] {
   display: none;
 }
+
+/* Visual lo-fi: só a tela local (filtro + camada por cima); não muda o que vai ao Habblaud World. */
+.lofi #world {
+  filter: sepia(0.35) saturate(0.8) hue-rotate(-12deg) contrast(1.08) brightness(0.94);
+}
+.lofi body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 2147483000;
+  pointer-events: none;
+  /* pontilhado Bayer 4x4 + vinheta */
+  background:
+    radial-gradient(ellipse at center, transparent 55%, rgb(30 16 40 / 0.45) 100%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4' shape-rendering='crispEdges'%3E%3Cg fill='%23000'%3E%3Crect width='1' height='1' fill-opacity='0'/%3E%3Crect x='2' y='2' width='1' height='1' fill-opacity='.08'/%3E%3Crect x='2' width='1' height='1' fill-opacity='.04'/%3E%3Crect y='2' width='1' height='1' fill-opacity='.12'/%3E%3Crect x='1' y='1' width='1' height='1' fill-opacity='.1'/%3E%3Crect x='3' y='3' width='1' height='1' fill-opacity='.06'/%3E%3Crect x='3' y='1' width='1' height='1' fill-opacity='.14'/%3E%3Crect x='1' y='3' width='1' height='1' fill-opacity='.02'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 100% 100%, 4px 4px;
+  image-rendering: pixelated;
+  mix-blend-mode: multiply;
+}
+.lofi body::before {
+  content: '';
+  position: fixed;
+  inset: -50%;
+  z-index: 2147483001;
+  pointer-events: none;
+  opacity: 0.07;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: lofi-grain 0.6s steps(4) infinite;
+}
+@keyframes lofi-grain {
+  25% { transform: translate(-3%, 2%); }
+  50% { transform: translate(2%, -3%); }
+  75% { transform: translate(-2%, -1%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lofi body::before { animation: none; }
+}

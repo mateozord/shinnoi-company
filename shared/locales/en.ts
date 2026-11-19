@@ -643,6 +643,8 @@ export const EN: Readonly<Record<string, string>> = {
   "Configurações": "Settings",
   "Aparência": "Appearance",
   "Escritório": "Office",
+  "Visual lo-fi": "Lo-fi look",
+  "Paleta quente, pontilhado e grão de filme sobre o escritório.": "Warm palette, dithering and film grain over the office.",
   "Mostrar nomes": "Show names",
   "Etiqueta com o nome acima de cada personagem.": "A name tag above each character.",
   "Notificações do navegador": "Browser notifications",

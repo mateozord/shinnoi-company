@@ -62,6 +62,7 @@ function isTypingTarget(t: EventTarget | null): boolean {
 export function createUI(root: HTMLElement, store: OfficeStore, world: WorldApi, city?: CitySceneHost): void {
   const storage = safeLocalStorage();
   let prefs: UiPrefs = loadPrefs(storage);
+  document.documentElement.classList.toggle('lofi', prefs.lofi);
   let selection: Selection = world.getSelection();
   let skew = 0;
   const narrowMq = typeof matchMedia === 'function' ? matchMedia(NARROW_QUERY) : null;
@@ -96,6 +97,7 @@ export function createUI(root: HTMLElement, store: OfficeStore, world: WorldApi,
     updatePrefs(patch) {
       prefs = { ...prefs, ...patch };
       savePrefs(storage, prefs);
+      document.documentElement.classList.toggle('lofi', prefs.lofi);
       world.setOptions(worldOptionsFrom(prefs));
       invalidate();
     },

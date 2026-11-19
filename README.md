@@ -1,3 +1,5 @@
+> **Shinnoi Company** é uma versão própria do [Habblaud](https://github.com/marmottajr/habblaud) (licença MIT), com o visual lo-fi dos nossos canais.
+
 <p align="center">
   <img src="client/public/assets/brand/logo-mark@4x.png" width="96" alt="Habblaud logo: a small pixel-art building" />
 </p>

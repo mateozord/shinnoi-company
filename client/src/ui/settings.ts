@@ -196,7 +196,7 @@ export class SettingsPopover implements UiComponent {
       'div',
       { class: 'ui-popover ui-settings', role: 'dialog', tabIndex: -1, attrs: { 'aria-label': tr('Configurações'), id: 'ui-settings', popover: 'auto' } },
       h('div', { class: 'ui-popover__head' }, h('h2', { text: tr('Configurações') }), close),
-      h('div', { class: 'ui-set-group' }, h('h3', { text: tr('Aparência') }), this.theme.row),
+      h('div', { class: 'ui-set-group' }, h('h3', { text: tr('Aparência') }), this.theme.row, sw('lofi', tr('Visual lo-fi'), tr('Paleta quente, pontilhado e grão de filme sobre o escritório.'), flip('lofi'))),
       h(
         'div',
         { class: 'ui-set-group' },

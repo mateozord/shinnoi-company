@@ -10,6 +10,11 @@ do meio (0.**3**.0).
 
 ## [Não lançado]
 
+### Adicionado
+
+- **Visual lo-fi** em Configurações › Aparência: paleta quente e dessaturada, pontilhado Bayer, vinheta e grão de
+  filme sobre o escritório. Só muda a tela local; nada vai para o Habblaud World.
+
 ## [1.0.3] - 2026-10-16
 
 ### Corrigido
